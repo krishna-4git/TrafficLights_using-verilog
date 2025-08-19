@@ -8,30 +8,45 @@ module TimingCircuits(
     output reg Timer_done
 );
 
-//setting clk frequancy as parameter
+//setting clk frequency as parameter
 parameter clk_freq    = 32'd50000000;
 parameter count_25sec = 25 * clk_freq;
 parameter count_4sec  =  4 * clk_freq;
 
 reg [30:0] count;
 reg [30:0] target_count;
+reg running;
 
-//to put conditions for counting 
+//counter logic 
 always@(posedge clk or posedge rst) begin 
     if(rst) begin 
-        count      <= 31'b0;
-        Timer_done <=  1'b0;
-    end else if(Start_LongTimer) begin 
         count        <= 31'b0;
-        Timer_done   <=  1'b0;
-        target_count <= count_25sec;       
-    end else if(Start_ShortTimer) begin 
-        count        <= 31'b0;
-        Timer_done   <=  1'b0;
-        target_count <= count_4sec;        
-    end else if(!Timer_done) begin //counter start from next clk of the trigger
-        if(count == target_count-2) Timer_done <= 1'b1;
-        else count  <= count+1 ;
+        Timer_done   <= 1'b0;
+        running      <= 1'b0;
+        target_count <= 31'b0;
+    end else begin
+        if(!running) begin 
+            if(Start_LongTimer) begin 
+                running      <= 1'b1;
+                target_count <= count_25sec;
+                count        <= 31'b0;
+                Timer_done   <= 1'b0;
+            end else if(Start_ShortTimer) begin 
+                running      <= 1'b1;
+                target_count <= count_4sec;
+                count        <= 31'b0;
+                Timer_done   <= 1'b0;
+            end else begin 
+                Timer_done   <= 1'b0; // stay idle
+            end
+        end else begin 
+            if(count >= target_count-1) begin 
+                Timer_done <= 1'b1;
+                running    <= 1'b0;   // allow retrigger next time
+            end else begin 
+                count <= count + 1;
+            end
+        end
     end
 end
 
