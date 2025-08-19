@@ -9,7 +9,8 @@ module TimingCircuits(
 );
 
 //setting clk frequency as parameter
-parameter clk_freq    = 32'd50000000;
+//parameter clk_freq    = 32'd50_000_000;
+parameter clk_freq    = 32'd10       ;  // lets use 10hz as frequancy for simulation purposes
 parameter count_25sec = 25 * clk_freq;
 parameter count_4sec  =  4 * clk_freq;
 
