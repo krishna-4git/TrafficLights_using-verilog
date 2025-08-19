@@ -40,12 +40,12 @@ always@(posedge clk or posedge rst) begin
             end else begin 
                 Timer_done   <= 1'b0; // stay idle
             end
-        end else begin 
-            if(count >= target_count-1) begin 
-                Timer_done <= 1'b1;
-                running    <= 1'b0;   // allow retrigger next time
-            end else begin 
-                count <= count + 1;
+        end else if(running) begin
+            if(count == target_count-2) begin
+            Timer_done <= 1'b1;
+            running    <= 1'b0;   // <-- release so next trigger can load a new target
+            end else begin
+            count <= count + 1;
             end
         end
     end
